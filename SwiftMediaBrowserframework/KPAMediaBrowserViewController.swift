@@ -11,11 +11,15 @@ protocol KPAMediaBrowserCollectionViewDelegate
 {
     
 }
-class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate{
+class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
 
     var delegate:KPAMediaBrowserCollectionViewDelegate?;
     var dataSourceImages:[String]!;
     var collectionView:UICollectionView?;
+    //var layoutSectionInsets:UIEdgeInsets?;  //user can  set the layout SectionInsets
+    //var layoutItemSize:CGSize?;  //user can  set the layout ItemSize
+    var margin, gutter, marginL, gutterL, columns, columnsL:CGFloat!;
+    var numberOfSections = 1; //current implementation is for one sections
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -24,42 +28,51 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     {
         super.init(nibName: nil, bundle: nil)
         self.delegate = delegate;
+        // Defaults
+        columns = 3; columnsL = 4;
+        margin = 0; gutter = 1;
+        marginL = 0;  gutterL = 1;
         
+        // For pixel perfection...
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
+            // iPad
+            columns = 6; columnsL = 8;
+            margin = 1 ; gutter = 2;
+            marginL = 1; gutterL = 2;
+        } else if (UIScreen.mainScreen().bounds.size.height == 480) {
+            // iPhone 3.5 inch
+            columns = 3; columnsL = 4;
+            margin = 0; gutter = 1;
+            marginL = 1; gutterL = 2;
+        } else {
+            // iPhone 4 inch
+            columns = 3; columnsL = 5;
+            margin = 0; gutter = 1;
+            marginL = 0; gutterL = 2;
+        }
+        
+
         
     }
  
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        let screenHeight = UIScreen.mainScreen().bounds.size.height;
-        let nativeScale = UIScreen.mainScreen().nativeScale;
-         if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
-            layout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
-            layout.itemSize = CGSize(width: 90, height: 72)
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout();
+//        let margin = self.getMargin();
+//        layout.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
+//        layout.itemSize = self.calculatedLayoutItemSize();
+        if(self.collectionView == nil)
+        {
+          self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
+            self.collectionView?.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
         }
-        else if (screenHeight == 480) //3.5inch screen
-         {
-         }
-        else if(screenHeight == 568)//iPhone5 5S
-         {
-         }
-        else if (nativeScale == 3.0) //iphone 6Plus
-         {
-         }
-        else if(screenHeight >= 480 && nativeScale == 2.0) //iphone6
-         {
-            layout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
-            layout.itemSize = CGSize(width: 100, height: 100)
-         }
-        
-        self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
          self.collectionView!.dataSource = self
          self.collectionView!.delegate = self
-        
          self.collectionView!.registerClass(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
          self.collectionView!.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(collectionView!)
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -67,6 +80,59 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         // Dispose of any resources that can be recreated.
     }
     
+    func performLayout() {
+    if let navBar = self.navigationController?.navigationBar
+    {
+    self.collectionView!.contentInset = UIEdgeInsetsMake(navBar.frame.origin.y + navBar.frame.size.height + self.getGutter(), 0, 0, 0);
+        }
+    }
+    override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        self.collectionView!.reloadData();
+        //let numberFormatter = NSNumberFormatter()
+        //let number = numberFormatter.numberFromString(UIDevice.currentDevice().systemVersion)?.floatValue
+        //if(number < 7)
+        // {
+        //self.performLayout(); // needed for iOS 5 & 6
+      //  }
+    }
+    /*
+    layout properties
+    */
+    func getColumns()->CGFloat
+    {
+    if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait))
+    {
+    return columns;
+    }
+   else {
+    return columnsL;
+    }
+    }
+    
+    func getMargin() -> CGFloat {
+        if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait)){
+    return margin;
+    } else {
+    return marginL;
+    }
+    }
+    
+    func getGutter() -> CGFloat {
+        if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait)){
+    return gutter;
+    } else {
+    return gutterL;
+    }
+    }
+    
+    func calculatedLayoutItemSize() -> CGSize
+    {
+        let margin = Float(self.getMargin());
+        let gutter = Float(self.getGutter());
+        let columns = Float(self.getColumns());
+    let value = floorf(((Float(self.view!.bounds.size.width) - (columns - 1.0 * gutter - 2.0 * margin)) / columns));
+    return CGSizeMake(CGFloat(value), CGFloat(value));
+    }
 
     /*
     // MARK: - Navigation
@@ -77,14 +143,20 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         // Pass the selected object to the new view controller.
     }
     */
+    /*
+    Collectionview delegate
+    */
      func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return 1;
+        return numberOfSections;
     }
 
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath)
     {
         print("selected row\(indexPath.row)")
     }
+    /*
+    Collectionview data source
+    */
      func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return (dataSourceImages?.count)!;
     }
@@ -96,4 +168,32 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
                 return cell;
     }
     
+    /*
+    FlowLayout delegate
+    */
+    func collectionView(collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAtIndex section: Int) -> UIEdgeInsets
+    {
+        let margin = self.getMargin();
+        return UIEdgeInsetsMake(margin, margin, margin, margin);
+    }
+    func collectionView(collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat
+    {
+        return self.getGutter();
+    }
+    func collectionView(collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat
+    {
+        return self.getGutter();
+    }
+    func collectionView(collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize
+    {
+        return calculatedLayoutItemSize();
+    }
 }

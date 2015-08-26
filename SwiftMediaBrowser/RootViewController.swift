@@ -52,6 +52,7 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
 */
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
     {
+   
         switch(indexPath.row)
         {
             
@@ -60,6 +61,26 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
             {
                 let mediaBrowser =  KPAMediaBrowserViewController(delegate: self);
                 mediaBrowser.dataSourceImages = recipeImages;
+//                let screenHeight = UIScreen.mainScreen().bounds.size.height;
+//                let nativeScale = UIScreen.mainScreen().nativeScale;
+//                if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
+//                    mediaBrowser.layoutSectionInsets = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
+//                    mediaBrowser.layoutItemSize = CGSize(width: 90, height: 72)
+//                }
+//                else if (screenHeight == 480) //3.5inch screen
+//                {
+//                }
+//                else if(screenHeight == 568)//iPhone5 5S
+//                {
+//                }
+//                else if (nativeScale == 3.0) //iphone 6Plus
+//                {
+//                }
+//                else if(screenHeight >= 480 && nativeScale == 2.0) //iphone6
+//                {
+//                    mediaBrowser.layoutSectionInsets = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
+//                    mediaBrowser.layoutItemSize = CGSize(width: 90, height: 72)
+//                }
                 self.navigationController?.pushViewController(mediaBrowser, animated: true);
             }
             else
