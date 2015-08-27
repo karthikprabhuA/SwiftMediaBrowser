@@ -50,29 +50,36 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
             margin = 0; gutter = 1;
             marginL = 0; gutterL = 2;
         }
-        
+        initializeViewLayout();
 
         
     }
- 
+    func initializeViewLayout()
+    {
+    let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout();
+    //        let margin = self.getMargin();
+    //        layout.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
+    //        layout.itemSize = self.calculatedLayoutItemSize();
+    if(self.collectionView == nil)
+    {
+    self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
+    self.collectionView?.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+    }
+    self.collectionView!.dataSource = self
+    self.collectionView!.delegate = self
+    self.collectionView!.registerClass(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
+    self.collectionView!.backgroundColor = UIColor.whiteColor()
+    self.view.addSubview(collectionView!)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout();
-//        let margin = self.getMargin();
-//        layout.sectionInset = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
-//        layout.itemSize = self.calculatedLayoutItemSize();
-        if(self.collectionView == nil)
+    }
+    override func viewWillAppear(animated: Bool) {
+        if(self.collectionView != nil)
         {
-          self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
-            self.collectionView?.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+            self.collectionView?.reloadData();
         }
-         self.collectionView!.dataSource = self
-         self.collectionView!.delegate = self
-         self.collectionView!.registerClass(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
-         self.collectionView!.backgroundColor = UIColor.whiteColor()
-        self.view.addSubview(collectionView!)
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -153,6 +160,14 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath)
     {
         print("selected row\(indexPath.row)")
+        let imageViewController = KPAImageViewController(nibName: nil, bundle: nil);
+        let imagePath = self.dataSourceImages[indexPath.row];
+        imageViewController.imageView.image = UIImage(named: imagePath);
+        imageViewController.title = imagePath.stringByDeletingPathExtension;
+        if let nav = self.navigationController
+        {
+        nav.pushViewController(imageViewController, animated: true);
+        }
     }
     /*
     Collectionview data source

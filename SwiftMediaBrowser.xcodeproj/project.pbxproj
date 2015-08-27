@@ -15,6 +15,7 @@
 		287673A71B8B26C300498F27 /* SwiftMediaBrowserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287673A61B8B26C300498F27 /* SwiftMediaBrowserTests.swift */; };
 		287673B21B8B26C300498F27 /* SwiftMediaBrowserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287673B11B8B26C300498F27 /* SwiftMediaBrowserUITests.swift */; };
 		287673F61B8B2B2300498F27 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287673F51B8B2B2300498F27 /* RootViewController.swift */; };
+		28D02F081B8EF14800C72B08 /* KPAImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D02F071B8EF14800C72B08 /* KPAImageViewController.swift */; };
 		28E5D9DF1B8C4D9C00570384 /* KPAMediaBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E5D9DE1B8C4D9C00570384 /* KPAMediaBrowserViewController.swift */; };
 		28E5D9E11B8C7D0300570384 /* KPAMediaBrowserCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E5D9E01B8C7D0300570384 /* KPAMediaBrowserCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
@@ -51,6 +52,7 @@
 		287673B11B8B26C300498F27 /* SwiftMediaBrowserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMediaBrowserUITests.swift; sourceTree = "<group>"; };
 		287673B31B8B26C300498F27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		287673F51B8B2B2300498F27 /* RootViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+		28D02F071B8EF14800C72B08 /* KPAImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KPAImageViewController.swift; sourceTree = "<group>"; };
 		28E5D9DE1B8C4D9C00570384 /* KPAMediaBrowserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KPAMediaBrowserViewController.swift; sourceTree = "<group>"; };
 		28E5D9E01B8C7D0300570384 /* KPAMediaBrowserCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KPAMediaBrowserCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -138,6 +140,7 @@
 			children = (
 				28E5D9DE1B8C4D9C00570384 /* KPAMediaBrowserViewController.swift */,
 				28E5D9E01B8C7D0300570384 /* KPAMediaBrowserCollectionViewCell.swift */,
+				28D02F071B8EF14800C72B08 /* KPAImageViewController.swift */,
 			);
 			name = SwiftMediaBrowserFramework;
 			path = SwiftMediaBrowserframework;
@@ -276,6 +279,7 @@
 				287673941B8B26C300498F27 /* ViewController.swift in Sources */,
 				28E5D9E11B8C7D0300570384 /* KPAMediaBrowserCollectionViewCell.swift in Sources */,
 				28E5D9DF1B8C4D9C00570384 /* KPAMediaBrowserViewController.swift in Sources */,
+				28D02F081B8EF14800C72B08 /* KPAImageViewController.swift in Sources */,
 				287673921B8B26C300498F27 /* AppDelegate.swift in Sources */,
 				287673F61B8B2B2300498F27 /* RootViewController.swift in Sources */,
 			);
