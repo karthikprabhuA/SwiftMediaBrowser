@@ -14,7 +14,7 @@ protocol KPAMediaBrowserCollectionViewDelegate
 class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
 
     var delegate:KPAMediaBrowserCollectionViewDelegate?;
-    var dataSourceImages:[String]!;
+    var dataSourceImages:Array<String>!;
     var collectionView:UICollectionView?;
     //var layoutSectionInsets:UIEdgeInsets?;  //user can  set the layout SectionInsets
     //var layoutItemSize:CGSize?;  //user can  set the layout ItemSize
@@ -65,6 +65,7 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
     self.collectionView?.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
     }
+        
     self.collectionView!.dataSource = self
     self.collectionView!.delegate = self
     self.collectionView!.registerClass(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
@@ -160,14 +161,17 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath)
     {
         print("selected row\(indexPath.row)")
-        let imageViewController = KPAImageViewController(nibName: nil, bundle: nil);
-        let imagePath = self.dataSourceImages[indexPath.row];
-        imageViewController.imageView.image = UIImage(named: imagePath);
-        imageViewController.title = imagePath.stringByDeletingPathExtension;
-        if let nav = self.navigationController
-        {
-        nav.pushViewController(imageViewController, animated: true);
-        }
+        let pageViewController = KPAMBPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        pageViewController.view.frame = self.collectionView!.frame;
+        pageViewController.pageImages = dataSourceImages;
+        pageViewController.currentIndex = indexPath.row;
+        let startingViewController: KPAImageViewController = pageViewController.viewControllerAtIndex(indexPath.row)!
+        let viewControllers: NSArray = [startingViewController]
+        pageViewController.setViewControllers(viewControllers as? [UIViewController], direction:UIPageViewControllerNavigationDirection.Forward, animated: true, completion: nil)
+        self.addChildViewController(pageViewController)
+        self.view.addSubview(pageViewController.view)
+        pageViewController.didMoveToParentViewController(self)
+
     }
     /*
     Collectionview data source

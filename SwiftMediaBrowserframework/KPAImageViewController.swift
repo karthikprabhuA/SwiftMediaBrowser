@@ -10,6 +10,9 @@ import UIKit
 
 class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     var imageView:UIImageView!;
+    var scrollImg: UIScrollView!;
+    var pageIndex : Int = 0;
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -25,10 +28,14 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil);
         initializeImageViewForZooming();
     }
+    override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+        scrollImg.frame = UIScreen.mainScreen().bounds;
+    }
     func initializeImageViewForZooming()
     {
-        let rect = UIScreen.mainScreen().bounds;
-        let scrollImg: UIScrollView = UIScrollView(frame: rect)
+        let rect = self.view.frame;
+        self.view.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        scrollImg = UIScrollView(frame: rect)
         scrollImg.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
         scrollImg.delegate = self
         scrollImg.backgroundColor = UIColor.whiteColor();
