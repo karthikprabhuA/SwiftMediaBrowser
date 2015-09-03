@@ -77,11 +77,14 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         // Do any additional setup after loading the view, typically from a nib.
     }
     override func viewWillAppear(animated: Bool) {
+        self.navigationController?.navigationBarHidden = false;
         if(self.collectionView != nil)
         {
             self.collectionView?.reloadData();
         }
+        super.viewWillAppear(animated);
     }
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -168,10 +171,14 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         let startingViewController: KPAImageViewController = pageViewController.viewControllerAtIndex(indexPath.row)!
         let viewControllers: NSArray = [startingViewController]
         pageViewController.setViewControllers(viewControllers as? [UIViewController], direction:UIPageViewControllerNavigationDirection.Forward, animated: true, completion: nil)
-        self.addChildViewController(pageViewController)
-        self.view.addSubview(pageViewController.view)
-        pageViewController.didMoveToParentViewController(self)
+        self.navigationController?.navigationBarHidden = true;
 
+        UIView.transitionWithView(self.view, duration: 0.5, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { () -> Void in
+            self.addChildViewController(pageViewController)
+            self.view.addSubview(pageViewController.view)
+            pageViewController.didMoveToParentViewController(self)
+            }, completion: nil);
+    
     }
     /*
     Collectionview data source
