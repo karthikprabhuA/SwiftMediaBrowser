@@ -12,7 +12,8 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     var imageView:UIImageView!;
     var scrollImg: UIScrollView!;
     var pageIndex : Int = 0;
-    
+    var tapRecognizer:UITapGestureRecognizer!;
+    var captionView:KPACaptionView!;
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -44,7 +45,7 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         scrollImg.showsVerticalScrollIndicator = false
         scrollImg.flashScrollIndicators()
         scrollImg.minimumZoomScale = 1.0
-        scrollImg.maximumZoomScale = 10.0
+        scrollImg.maximumZoomScale = 4.0
         self.view.addSubview(scrollImg)
         self.imageView = UIImageView(frame: scrollImg.frame);
         self.imageView.contentMode = UIViewContentMode.ScaleAspectFit;
@@ -52,6 +53,13 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         imageView!.layer.cornerRadius = 11.0
         imageView!.clipsToBounds = false
         scrollImg.addSubview(imageView!)
+        captionView = KPACaptionView(frame: CGRectMake(0,imageView.frame.height - 88,imageView.frame.width,44));
+        captionView.setupCaption("sample cap")
+        self.view.addSubview(captionView);
+        self.view.bringSubviewToFront(captionView);
+        tapRecognizer = UITapGestureRecognizer(target: self, action: "doubleTapDetected:");
+        tapRecognizer.numberOfTapsRequired = 2;
+        self.view.addGestureRecognizer(tapRecognizer);
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder);
@@ -59,6 +67,19 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     }
     func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         return self.imageView
+    }
+    
+    //tag gesture
+    func doubleTapDetected(tapped:UITapGestureRecognizer)
+    {
+        if(self.scrollImg.zoomScale > 1.0)
+        {
+         self.scrollImg.setZoomScale(1.0, animated: true)
+        }
+        else
+        {
+          self.scrollImg.setZoomScale(4.0, animated: true)
+        }
     }
     /*
     // MARK: - Navigation

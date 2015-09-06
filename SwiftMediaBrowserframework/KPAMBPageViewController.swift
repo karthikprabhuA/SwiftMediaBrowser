@@ -10,7 +10,8 @@ import UIKit
 
 class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSource,UIPageViewControllerDelegate,UINavigationBarDelegate {
     var toolbar :UIToolbar!;
-    
+    var navigationBar:UINavigationBar!;
+    var tapRecognizer:UITapGestureRecognizer!;
     var currentIndex : Int = 0
         {
             didSet
@@ -48,14 +49,31 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         let action = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: "shareImage");
         toolbar.setItems([action], animated: false);
         self.view.addSubview(toolbar);
-
+        tapRecognizer = UITapGestureRecognizer(target: self, action: "SingleTapDetected:");
+        tapRecognizer.numberOfTapsRequired = 1;
+        self.view.addGestureRecognizer(tapRecognizer);
+    }
+    func SingleTapDetected(tapped:UITapGestureRecognizer)
+    {
+        UIView.animateWithDuration(0.5) { () -> Void in
+            if(self.navigationBar.hidden)
+            {
+            self.navigationBar.hidden = false;
+            self.toolbar.hidden = false;
+            }
+            else
+            {
+            self.navigationBar.hidden = true;
+            self.toolbar.hidden = true;
+            }
+        }
     }
     func createNavBar()
     {
         let app = UIApplication.sharedApplication();
         let height = app.statusBarFrame.size.height;
         // Create the navigation bar
-        let navigationBar = UINavigationBar(frame: CGRectMake(0, height, self.view.frame.size.width, 44)) // Offset by 20 pixels vertically to take the status bar into account
+        navigationBar = UINavigationBar(frame: CGRectMake(0, height, self.view.frame.size.width, 44)) // Offset by 20 pixels vertically to take the status bar into account
         
         navigationBar.backgroundColor = UIColor.whiteColor()
         navigationBar.delegate = self;
@@ -79,11 +97,14 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
  
     func backButtonClicked(sender: UIBarButtonItem) {
         self.parentViewController?.navigationController?.navigationBarHidden = false;
-        UIView.transitionWithView(self.view, duration: 0.5, options: UIViewAnimationOptions.TransitionCurlUp, animations: { () -> Void in
-            self.view.removeFromSuperview();
-            self.removeFromParentViewController();
-            }, completion: nil);
-
+        UIView.animateWithDuration(0.5, delay: 0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+//            self.view.center = CGPointMake(120, 264);
+            self.view.alpha = 0.0;
+            self.view.transform = CGAffineTransformMakeScale(0.0001,0.0001);
+            }) { (finished:Bool) -> Void in
+                self.view.removeFromSuperview();
+                self.removeFromParentViewController();
+        }
         
     }
     override func viewWillAppear(animated: Bool) {
@@ -109,7 +130,6 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
     override init(transitionStyle style: UIPageViewControllerTransitionStyle, navigationOrientation: UIPageViewControllerNavigationOrientation, options: [String : AnyObject]?) {
         super.init(transitionStyle: style, navigationOrientation: navigationOrientation, options: options);
         createNavBar();
-
     }
      override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         let navigationBarHeight: CGFloat = self.navigationController!.navigationBar.frame.height;
