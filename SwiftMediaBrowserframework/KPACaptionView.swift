@@ -40,7 +40,7 @@ class KPACaptionView:UIView {
         label.backgroundColor = UIColor.clearColor()
         label.textAlignment = NSTextAlignment.Center
         label.lineBreakMode = NSLineBreakMode.ByWordWrapping
-        label.numberOfLines = 2
+        label.numberOfLines = 3
         label.textColor = UIColor.blackColor()
         label.font = UIFont.systemFontOfSize(17)
         label.text = caption;

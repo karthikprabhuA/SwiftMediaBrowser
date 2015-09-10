@@ -51,7 +51,7 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         self.view.addSubview(toolbar);
         tapRecognizer = UITapGestureRecognizer(target: self, action: "SingleTapDetected:");
         tapRecognizer.numberOfTapsRequired = 1;
-        self.view.addGestureRecognizer(tapRecognizer);
+        //self.view.addGestureRecognizer(tapRecognizer); //currently disabled need to handle single aswell as double tap
     }
     func SingleTapDetected(tapped:UITapGestureRecognizer)
     {
@@ -147,11 +147,18 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         
         // Create a new view controller and pass suitable data.
         let pageContentViewController = KPAImageViewController(nibName: nil, bundle: nil)
-        pageContentViewController.imageView.image = UIImage(named: pageImages[index]);
+        pageContentViewController.setContentImage(UIImage(named: pageImages[index])!);
         pageContentViewController.pageIndex = index
         currentIndex = index
         
         return pageContentViewController
+    }
+    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        if(completed)
+        {
+           let prevPageContentView =  previousViewControllers.last as! KPAImageViewController
+            prevPageContentView.scrollImg.setZoomScale(1.0, animated: false);
+        }
     }
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController?
     {
@@ -160,6 +167,7 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         if (index == 0) || (index == NSNotFound) {
             return nil
         }
+    
         
         index--
         
