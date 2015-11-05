@@ -7,48 +7,48 @@
 //
 
 import UIKit
-extension UIScrollView {
-    func zoomToPoint(point: CGPoint, withScale scale: CGFloat, animated: Bool) {
-        var x, y, width, height: CGFloat
+class ImageScrollView: UIScrollView
+{
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        let tapOnce:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "tapOnce")
+        tapOnce.numberOfTapsRequired = 1;
+        self.addGestureRecognizer(tapOnce);
         
-        //Normalize current content size back to content scale of 1.0f
-        width = (self.contentSize.width / self.zoomScale)
-        height = (self.contentSize.height / self.zoomScale)
-        let contentSize = CGSize(width: width, height: height)
+        let tapTwice:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "tapTwice")
+        tapTwice.numberOfTapsRequired = 2;
+        self.addGestureRecognizer(tapTwice);
         
-        //translate the zoom point to relative to the content rect
-        x = (point.x / self.bounds.size.width) * contentSize.width
-        y = (point.y / self.bounds.size.height) * contentSize.height
-        let zoomPoint = CGPoint(x: x, y: y)
-        
-        //derive the size of the region to zoom to
-        width = self.bounds.size.width / scale
-        height = self.bounds.size.height / scale
-        let zoomSize = CGSize(width: width, height: height)
-        
-        //offset the zoom rect so the actual zoom point is in the middle of the rectangle
-        x = zoomPoint.x - zoomSize.width / 2.0
-        y = zoomPoint.y - zoomSize.height / 2.0
-        width = zoomSize.width
-        height = zoomSize.height
-        let zoomRect = CGRect(x: x, y: y, width: width, height: height)
-        
-        //apply the resize
-        self.zoomToRect(zoomRect, animated: animated)
     }
+    func tapOnce()
+    {
+        print("tappedonce");
+        self.zoomScale = 1.0;
+    }
+    func tapTwice()
+    {
+        print("tappedTwice");
+        self.zoomScale = 2.0;
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    
 }
-class KPAImageViewController: UIViewController {
-    var image:UIImage!;
-    var scrollImg: KPAImageScrollView!;
+class KPAImageViewController: UIViewController,UIScrollViewDelegate {
+    var imageView:UIImageView!;
+    var scrollImg: ImageScrollView!;
     var pageIndex : Int = 0;
-    var captionView:KPACaptionView!;
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-
+        
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -65,40 +65,39 @@ class KPAImageViewController: UIViewController {
     {
         let rect = self.view.frame;
         self.view.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
-        scrollImg = KPAImageScrollView(frame: rect)
+        scrollImg = ImageScrollView(frame: rect)
         scrollImg.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        scrollImg.delegate = self
         scrollImg.backgroundColor = UIColor.whiteColor();
         scrollImg.alwaysBounceVertical = false
         scrollImg.alwaysBounceHorizontal = false
         scrollImg.showsVerticalScrollIndicator = false
         scrollImg.flashScrollIndicators()
-        scrollImg.minimumZoomScale = 1.0;
-        scrollImg.maximumZoomScale = 4.0
-
+        scrollImg.minimumZoomScale = 1.0
+        scrollImg.maximumZoomScale = 10.0
         self.view.addSubview(scrollImg)
-        captionView = KPACaptionView(frame: CGRectMake(0,self.view.frame.height - 88,self.view.frame.width,44));
-        captionView.setupCaption("Use these properties: barTintColor to get the color of the navigation bar background")
-        self.view.addSubview(captionView);
-        self.view.bringSubviewToFront(captionView);
+        self.imageView = UIImageView(frame: scrollImg.frame);
+        self.imageView.contentMode = UIViewContentMode.ScaleAspectFit;
+        self.imageView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        imageView!.layer.cornerRadius = 11.0
+        imageView!.clipsToBounds = false
+        scrollImg.addSubview(imageView!)
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder);
-
+        
     }
-    func setContentImage(image:UIImage)
-    {
-        scrollImg.imageView.image = image;
-        scrollImg.imageView.frame.size = image.size;
+    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+        return self.imageView
     }
-    
-       /*
+    /*
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    // Get the new view controller using segue.destinationViewController.
+    // Pass the selected object to the new view controller.
     }
     */
-
+    
 }

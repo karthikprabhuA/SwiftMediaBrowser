@@ -10,35 +10,34 @@ import UIKit
 
 class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSource,UIPageViewControllerDelegate,UINavigationBarDelegate {
     var toolbar :UIToolbar!;
-    var navigationBar:UINavigationBar!;
-    var tapRecognizer:UITapGestureRecognizer!;
+    
     var currentIndex : Int = 0
         {
-            didSet
-            {
-                self.dataSource = self;
-                self.delegate = self;
+        didSet
+        {
+            self.dataSource = self;
+            self.delegate = self;
         }
     };
-   var pageImages:Array<String>! ;
+    var pageImages:Array<String>! ;
     
     override func viewDidLoad() {
         super.viewDidLoad()
         var navigationBarHeight: CGFloat? = (self.navigationController?.navigationBar.frame.height);
         if(navigationBarHeight == nil)
         {
-             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Phone) {
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Phone) {
                 if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait)){
-
-        navigationBarHeight = 44;
+                    
+                    navigationBarHeight = 44;
                 }
                 else {
                     navigationBarHeight = 32;
                 }
             }
             else
-             {
-              navigationBarHeight = 44;
+            {
+                navigationBarHeight = 44;
             }
         }
         // Do any additional setup after loading the view.
@@ -49,31 +48,18 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         let action = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: "shareImage");
         toolbar.setItems([action], animated: false);
         self.view.addSubview(toolbar);
-        tapRecognizer = UITapGestureRecognizer(target: self, action: "SingleTapDetected:");
-        tapRecognizer.numberOfTapsRequired = 1;
-        //self.view.addGestureRecognizer(tapRecognizer); //currently disabled need to handle single aswell as double tap
+        
     }
-    func SingleTapDetected(tapped:UITapGestureRecognizer)
+    func shareImage()
     {
-        UIView.animateWithDuration(0.5) { () -> Void in
-            if(self.navigationBar.hidden)
-            {
-            self.navigationBar.hidden = false;
-            self.toolbar.hidden = false;
-            }
-            else
-            {
-            self.navigationBar.hidden = true;
-            self.toolbar.hidden = true;
-            }
-        }
+        
     }
     func createNavBar()
     {
         let app = UIApplication.sharedApplication();
         let height = app.statusBarFrame.size.height;
         // Create the navigation bar
-        navigationBar = UINavigationBar(frame: CGRectMake(0, height, self.view.frame.size.width, 44)) // Offset by 20 pixels vertically to take the status bar into account
+        let navigationBar = UINavigationBar(frame: CGRectMake(0, height, self.view.frame.size.width, 44)) // Offset by 20 pixels vertically to take the status bar into account
         
         navigationBar.backgroundColor = UIColor.whiteColor()
         navigationBar.delegate = self;
@@ -92,24 +78,35 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         
         // Make the navigation bar a subview of the current view controller
         self.view.addSubview(navigationBar)
-
+        
     }
- 
+    
     func backButtonClicked(sender: UIBarButtonItem) {
         self.parentViewController?.navigationController?.navigationBarHidden = false;
-        UIView.animateWithDuration(0.5, delay: 0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-//            self.view.center = CGPointMake(120, 264);
-            self.view.alpha = 0.0;
-            self.view.transform = CGAffineTransformMakeScale(0.0001,0.0001);
+        //        UIView.transitionWithView(self.view, duration: 0.5, options: UIViewAnimationOptions.TransitionCurlUp, animations: { () -> Void in
+        //            self.view.removeFromSuperview();
+        //            self.removeFromParentViewController();
+        //            }, completion: nil);
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
+            self.view.transform = CGAffineTransformScale(self.view.transform, 0.01, 0.01);
             }) { (finished:Bool) -> Void in
                 self.view.removeFromSuperview();
                 self.removeFromParentViewController();
         }
+        //        [UIView animateWithDuration:secs delay:0.0 options:option
+        //            animations:^{
+        //            self.transform = CGAffineTransformScale(self.transform, 0.01, 0.01);
+        //            }
+        //            completion:^(BOOL finished) {
+        //            [self removeFromSuperview];
+        //            }];
+        
         
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated);
-
+        
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -119,19 +116,20 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         if (self.navigationController?.viewControllers.indexOf(self) == nil) {
             // back button was pressed.  We know this is true because self is no longer
             // in the navigation stack.
-                     print("Back Button pressed.")
-//            self.parentViewController?.navigationController?.navigationBarHidden = false;
-
+            print("Back Button pressed.")
+            //            self.parentViewController?.navigationController?.navigationBarHidden = false;
+            
         }
         super.viewWillDisappear(animated);
         
     }
-
+    
     override init(transitionStyle style: UIPageViewControllerTransitionStyle, navigationOrientation: UIPageViewControllerNavigationOrientation, options: [String : AnyObject]?) {
         super.init(transitionStyle: style, navigationOrientation: navigationOrientation, options: options);
         createNavBar();
+        
     }
-     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+    override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         let navigationBarHeight: CGFloat = self.navigationController!.navigationBar.frame.height;
         toolbar.frame = CGRectMake(0,UIScreen.mainScreen().bounds.height - navigationBarHeight, UIScreen.mainScreen().bounds.width, navigationBarHeight);
     }
@@ -147,18 +145,11 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         
         // Create a new view controller and pass suitable data.
         let pageContentViewController = KPAImageViewController(nibName: nil, bundle: nil)
-        pageContentViewController.setContentImage(UIImage(named: pageImages[index])!);
+        pageContentViewController.imageView.image = UIImage(named: pageImages[index]);
         pageContentViewController.pageIndex = index
         currentIndex = index
         
         return pageContentViewController
-    }
-    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        if(completed)
-        {
-           let prevPageContentView =  previousViewControllers.last as! KPAImageViewController
-            prevPageContentView.scrollImg.setZoomScale(1.0, animated: false);
-        }
     }
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController?
     {
@@ -167,7 +158,6 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         if (index == 0) || (index == NSNotFound) {
             return nil
         }
-    
         
         index--
         
@@ -191,14 +181,14 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         return viewControllerAtIndex(index)
     }
     
-//    func presentationCountForPageViewController(pageViewController: UIPageViewController) -> Int
-//    {
-//        return self.pageImages.count
-//    }
-//    
-//    func presentationIndexForPageViewController(pageViewController: UIPageViewController) -> Int
-//    {
-//        return 0
-//    }
-
+    //    func presentationCountForPageViewController(pageViewController: UIPageViewController) -> Int
+    //    {
+    //        return self.pageImages.count
+    //    }
+    //    
+    //    func presentationIndexForPageViewController(pageViewController: UIPageViewController) -> Int
+    //    {
+    //        return 0
+    //    }
+    
 }
