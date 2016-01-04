@@ -56,12 +56,11 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil);
-        initializeImageViewForZooming();
     }
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         scrollImg.frame = UIScreen.mainScreen().bounds;
     }
-    func initializeImageViewForZooming()
+    func initializeImageViewForZoomingWithImage(image:UIImage)
     {
         let rect = self.view.frame;
         self.view.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
@@ -77,11 +76,19 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         scrollImg.maximumZoomScale = 10.0
         self.view.addSubview(scrollImg)
         self.imageView = UIImageView(frame: scrollImg.frame);
+        self.imageView.image = image;
         self.imageView.contentMode = UIViewContentMode.ScaleAspectFit;
+         scrollImg.sizeToFit();
+        scrollImg.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        
         self.imageView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        scrollImg.frame.size = (self.imageView.image?.size)!;
+        self.imageView.frame.size = (self.imageView.image?.size)!;
+
         imageView!.layer.cornerRadius = 11.0
         imageView!.clipsToBounds = false
         scrollImg.addSubview(imageView!)
+       
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder);

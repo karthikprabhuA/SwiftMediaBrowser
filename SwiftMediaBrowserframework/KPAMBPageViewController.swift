@@ -145,7 +145,7 @@ class KPAMBPageViewController: UIPageViewController,UIPageViewControllerDataSour
         
         // Create a new view controller and pass suitable data.
         let pageContentViewController = KPAImageViewController(nibName: nil, bundle: nil)
-        pageContentViewController.imageView.image = UIImage(named: pageImages[index]);
+        pageContentViewController.initializeImageViewForZoomingWithImage(UIImage(named: pageImages[index])!);
         pageContentViewController.pageIndex = index
         currentIndex = index
         
