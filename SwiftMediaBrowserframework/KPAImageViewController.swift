@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import AVFoundation
+
 class ImageScrollView: UIScrollView
 {
+    var imageView:UIImageView?;
     override init(frame: CGRect) {
         super.init(frame: frame)
         let tapOnce:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "tapOnce")
@@ -35,7 +38,38 @@ class ImageScrollView: UIScrollView
         fatalError("init(coder:) has not been implemented")
     }
     
-    
+    override func layoutSubviews()
+    {
+        super.layoutSubviews()
+        
+        // center the zoom view as it becomes smaller than the size of the screen
+        let boundsSize:CGSize = self.bounds.size;
+        if let imageView = imageView {
+            var frameToCenter:CGRect = imageView.frame;
+            
+            // center horizontally
+            if (frameToCenter.size.width < boundsSize.width)
+            {
+                frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) / 2;
+            }
+            else
+            {
+                frameToCenter.origin.x = 0;
+            }
+            
+            // center vertically
+            if (frameToCenter.size.height < boundsSize.height)
+            {
+                frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) / 2;
+            }
+            else
+            {
+                frameToCenter.origin.y = 0;
+            }
+            imageView.frame = frameToCenter;
+        }
+    }
+
     
 }
 class KPAImageViewController: UIViewController,UIScrollViewDelegate {
@@ -73,23 +107,34 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         scrollImg.showsVerticalScrollIndicator = false
         scrollImg.flashScrollIndicators()
         scrollImg.minimumZoomScale = 1.0
-        scrollImg.maximumZoomScale = 10.0
+        scrollImg.maximumZoomScale = 4.0
         self.view.addSubview(scrollImg)
-        self.imageView = UIImageView(frame: scrollImg.frame);
+        self.imageView = UIImageView(frame: CGRectZero);
         self.imageView.image = image;
-        self.imageView.contentMode = UIViewContentMode.ScaleAspectFit;
-         scrollImg.sizeToFit();
-        scrollImg.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
-        
-        self.imageView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
-        scrollImg.frame.size = (self.imageView.image?.size)!;
-        self.imageView.frame.size = (self.imageView.image?.size)!;
-
+        self.imageView.frame.size = CGSizeAspectFit(self.imageView.image!.size, boundingSize: rect.size);
+        scrollImg.imageView = self.imageView;
+        scrollImg.contentSize = (self.imageView.frame.size);
         imageView!.layer.cornerRadius = 11.0
         imageView!.clipsToBounds = false
         scrollImg.addSubview(imageView!)
        
     }
+    
+    func CGSizeAspectFit( aspectRatio:CGSize,var  boundingSize:CGSize) -> CGSize
+    {
+    let mW = boundingSize.width / aspectRatio.width;
+    let mH = boundingSize.height / aspectRatio.height;
+    if( mH < mW )
+    {
+    boundingSize.width = boundingSize.height / aspectRatio.height * aspectRatio.width;
+        }
+    else if( mW < mH )
+    {
+    boundingSize.height = boundingSize.width / aspectRatio.width * aspectRatio.height;
+        }
+    return boundingSize;
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder);
         
