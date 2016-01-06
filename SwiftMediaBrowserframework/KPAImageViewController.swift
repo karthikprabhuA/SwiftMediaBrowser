@@ -69,12 +69,72 @@ class ImageScrollView: UIScrollView
             imageView.frame = frameToCenter;
         }
     }
-
+    func setMaxMinZoomScalesForCurrentBounds() {
+        
+        // Reset
+        self.maximumZoomScale = 1;
+        self.minimumZoomScale = 1;
+        self.zoomScale = 1;
+        
+        // Bail if no image
+        if (self.imageView != nil && self.imageView!.image == nil)
+        {
+            return;
+        }
+        
+        // Reset position
+        self.imageView!.frame = CGRectMake(0, 0, self.imageView!.frame.size.width, self.imageView!.frame.size.height);
+        
+        // Sizes
+        let boundsSize:CGSize = self.bounds.size;
+        let imageSize:CGSize = self.imageView!.image!.size;
+        
+        // Calculate Min
+        let xScale:CGFloat = boundsSize.width / imageSize.width;    // the scale needed to perfectly fit the image width-wise
+        let yScale:CGFloat = boundsSize.height / imageSize.height;  // the scale needed to perfectly fit the image height-wise
+        var minScale:CGFloat = min(xScale, yScale);                 // use minimum of these to allow the image to become fully visible
+        
+        // Calculate Max
+        var maxScale:CGFloat = 3;
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
+            // Let them go a bit bigger on a bigger screen!
+            maxScale = 4;
+        }
+        
+        // Image is smaller than screen so no zooming!
+        if (xScale >= 1 && yScale >= 1) {
+            minScale = 1.0;
+        }
+        
+        // Set min/max zoom
+        self.maximumZoomScale = maxScale;
+        self.minimumZoomScale = minScale;
+        
+        // Initial zoom
+        //self.zoomScale = [self initialZoomScaleWithMinScale];
+        
+        // If we're zooming to fill then centralise
+        if (self.zoomScale != minScale) {
+            
+            // Centralise
+            self.contentOffset = CGPointMake((imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
+                (imageSize.height * self.zoomScale - boundsSize.height) / 2.0);
+            
+        }
+        
+        // Disable scrolling initially until the first pinch to fix issues with swiping on an initally zoomed in photo
+        self.scrollEnabled = true;
+        
+        
+        // Layout
+        self.setNeedsLayout();
+        
+    }
     
 }
 class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     var imageView:UIImageView!;
-    var scrollImg: ImageScrollView!;
+    var scrollView: ImageScrollView!;
     var pageIndex : Int = 0;
     
     override func viewDidLoad() {
@@ -92,33 +152,33 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil);
     }
     override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
-        scrollImg.frame = UIScreen.mainScreen().bounds;
+        scrollView.frame = UIScreen.mainScreen().bounds;
     }
     func initializeImageViewForZoomingWithImage(image:UIImage)
     {
         let rect = self.view.frame;
         self.view.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
-        scrollImg = ImageScrollView(frame: rect)
-        scrollImg.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
-        scrollImg.delegate = self
-        scrollImg.backgroundColor = UIColor.whiteColor();
-        scrollImg.alwaysBounceVertical = false
-        scrollImg.alwaysBounceHorizontal = false
-        scrollImg.showsVerticalScrollIndicator = false
-        scrollImg.flashScrollIndicators()
-        scrollImg.minimumZoomScale = 1.0
-        scrollImg.maximumZoomScale = 4.0
-        self.view.addSubview(scrollImg)
-        self.imageView = UIImageView(frame: CGRectZero);
-        self.imageView.image = image;
-        self.imageView.frame.size = CGSizeAspectFit(self.imageView.image!.size, boundingSize: rect.size);
-        scrollImg.imageView = self.imageView;
-        scrollImg.contentSize = (self.imageView.frame.size);
+        scrollView = ImageScrollView(frame: rect)
+        scrollView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        scrollView.delegate = self
+        scrollView.backgroundColor = UIColor.whiteColor();
+        scrollView.alwaysBounceVertical = false
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.flashScrollIndicators()
+        scrollView.minimumZoomScale = 1.0
+        scrollView.maximumZoomScale = 4.0
+        self.view.addSubview(scrollView)
+        scrollView.imageView = UIImageView(frame: CGRectZero);
+        scrollView.imageView!.image = image;
+        scrollView.imageView!.frame.size = CGSizeAspectFit(scrollView.imageView!.image!.size, boundingSize: rect.size);
+        scrollView.contentSize = (scrollView.imageView!.frame.size);
         imageView!.layer.cornerRadius = 11.0
         imageView!.clipsToBounds = false
-        scrollImg.addSubview(imageView!)
+        scrollView.addSubview(imageView!)
        
     }
+
     
     func CGSizeAspectFit( aspectRatio:CGSize,var  boundingSize:CGSize) -> CGSize
     {
