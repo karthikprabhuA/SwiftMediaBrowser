@@ -14,21 +14,21 @@ class ImageScrollView: UIScrollView
     var imageView:UIImageView?;
     override init(frame: CGRect) {
         super.init(frame: frame)
-        let tapOnce:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "tapOnce")
+        let tapOnce:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.tapOnce))
         tapOnce.numberOfTapsRequired = 1;
         self.addGestureRecognizer(tapOnce);
         
-        let tapTwice:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "tapTwice")
+        let tapTwice:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ImageScrollView.tapTwice))
         tapTwice.numberOfTapsRequired = 2;
         self.addGestureRecognizer(tapTwice);
         
     }
-    func tapOnce()
+    @objc func tapOnce()
     {
         print("tappedonce");
         self.zoomScale = 1.0;
     }
-    func tapTwice()
+    @objc func tapTwice()
     {
         print("tappedTwice");
         self.zoomScale = 2.0;
@@ -83,7 +83,7 @@ class ImageScrollView: UIScrollView
         }
         
         // Reset position
-        self.imageView!.frame = CGRectMake(0, 0, self.imageView!.frame.size.width, self.imageView!.frame.size.height);
+        self.imageView!.frame = CGRect(x:0, y:0, width:self.imageView!.frame.size.width, height:self.imageView!.frame.size.height);
         
         // Sizes
         let boundsSize:CGSize = self.bounds.size;
@@ -96,7 +96,7 @@ class ImageScrollView: UIScrollView
         
         // Calculate Max
         var maxScale:CGFloat = 3;
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad) {
             // Let them go a bit bigger on a bigger screen!
             maxScale = 4;
         }
@@ -117,13 +117,13 @@ class ImageScrollView: UIScrollView
         if (self.zoomScale != minScale) {
             
             // Centralise
-            self.contentOffset = CGPointMake((imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
-                (imageSize.height * self.zoomScale - boundsSize.height) / 2.0);
+            self.contentOffset = CGPoint(x:(imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
+                                         y:(imageSize.height * self.zoomScale - boundsSize.height) / 2.0);
             
         }
         
         // Disable scrolling initially until the first pinch to fix issues with swiping on an initally zoomed in photo
-        self.scrollEnabled = true;
+        self.isScrollEnabled = true;
         
         
         // Layout
@@ -148,20 +148,20 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil);
     }
-    override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
-        scrollView.frame = UIScreen.mainScreen().bounds;
+    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
+        scrollView.frame = UIScreen.main.bounds;
     }
     func initializeImageViewForZoomingWithImage(image:UIImage)
     {
         let rect = self.view.frame;
-        self.view.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        self.view.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight,UIView.AutoresizingMask.flexibleWidth];
         scrollView = ImageScrollView(frame: rect)
-        scrollView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        scrollView.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight,UIView.AutoresizingMask.flexibleWidth];
         scrollView.delegate = self
-        scrollView.backgroundColor = UIColor.whiteColor();
+        scrollView.backgroundColor = UIColor.white;
         scrollView.alwaysBounceVertical = false
         scrollView.alwaysBounceHorizontal = false
         scrollView.showsVerticalScrollIndicator = false
@@ -169,9 +169,10 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
         scrollView.minimumZoomScale = 1.0
         scrollView.maximumZoomScale = 4.0
         self.view.addSubview(scrollView)
-        scrollView.imageView = UIImageView(frame: CGRectZero);
+        imageView = UIImageView(frame: CGRect.zero);
+        scrollView.imageView = imageView
         scrollView.imageView!.image = image;
-        scrollView.imageView!.frame.size = CGSizeAspectFit(scrollView.imageView!.image!.size, boundingSize: rect.size);
+        scrollView.imageView!.frame.size = CGSizeAspectFit(aspectRatio: scrollView.imageView!.image!.size, boundingSize: rect.size);
         scrollView.contentSize = (scrollView.imageView!.frame.size);
         imageView!.layer.cornerRadius = 11.0
         imageView!.clipsToBounds = false
@@ -180,19 +181,20 @@ class KPAImageViewController: UIViewController,UIScrollViewDelegate {
     }
 
     
-    func CGSizeAspectFit( aspectRatio:CGSize,var  boundingSize:CGSize) -> CGSize
+    func CGSizeAspectFit( aspectRatio:CGSize,  boundingSize:CGSize) -> CGSize
     {
-    let mW = boundingSize.width / aspectRatio.width;
-    let mH = boundingSize.height / aspectRatio.height;
+    var size = boundingSize
+    let mW = size.width / aspectRatio.width;
+    let mH = size.height / aspectRatio.height;
     if( mH < mW )
     {
-    boundingSize.width = boundingSize.height / aspectRatio.height * aspectRatio.width;
+    size.width = size.height / aspectRatio.height * aspectRatio.width;
         }
     else if( mW < mH )
     {
-    boundingSize.height = boundingSize.width / aspectRatio.width * aspectRatio.height;
+    size.height = size.width / aspectRatio.width * aspectRatio.height;
         }
-    return boundingSize;
+    return size;
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -13,9 +13,9 @@ class KPAMediaBrowserCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame);
         self.imageView = UIImageView(frame: self.bounds);
-        self.imageView.contentMode = .ScaleAspectFill;
+        self.imageView.contentMode = .scaleAspectFill;
         self.imageView.clipsToBounds = true;
-        self.imageView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        self.imageView.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight,UIView.AutoresizingMask.flexibleWidth];
         self.addSubview(self.imageView);
     }
 

@@ -9,6 +9,7 @@
 import UIKit
 
 class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSource,KPAMediaBrowserCollectionViewDelegate {
+ 
 
     var  numberOfRows:Int = 3;
     var recipeImages:[String]!;
@@ -19,15 +20,15 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
         // Do any additional setup after loading the view, typically from a nib.
         segmentedControl = UISegmentedControl(items: ["Push","Modal"]);
         segmentedControl.selectedSegmentIndex = 0;
-        segmentedControl.addTarget(self, action: "segmentChange", forControlEvents: UIControlEvents.ValueChanged);
+        segmentedControl.addTarget(self, action: #selector(RootViewController.segmentChange), for: UIControl.Event.valueChanged);
         let item = UIBarButtonItem(customView: segmentedControl);
         self.navigationItem.rightBarButtonItem = item;
-        self.tableView.registerClass(UITableViewCell.classForCoder(), forCellReuseIdentifier: "TitleCellIdentifier")
+        self.tableView.register(UITableViewCell.classForCoder(), forCellReuseIdentifier: "TitleCellIdentifier")
         recipeImages = ["angry_birds_cake.jpg","creme_brelee.jpg","egg_benedict.jpg", "full_breakfast.jpg", "green_tea.jpg", "ham_and_cheese_panini.jpg", "ham_and_egg_sandwich.jpg", "hamburger.jpg", "instant_noodle_with_egg.jpg", "japanese_noodle_with_pork.jpg", "mushroom_risotto.jpg", "noodle_with_bbq_pork.jpg", "starbucks_coffee.jpg", "thai_shrimp_cake.jpg", "vegetable_curry.jpg", "white_chocolate_donut.jpg"];
     }
     
 
-    func segmentChange()
+    @objc func segmentChange()
     {
         self.tableView.reloadData();
     }
@@ -50,7 +51,7 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
 /*
     UITableViewDelegate
 */
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
     {
    
         switch(indexPath.row)
@@ -87,7 +88,7 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
             {
                 let mediaBrowser =  KPAMediaBrowserViewController(delegate: self);
                 mediaBrowser.dataSourceImages = recipeImages;
-                self.presentViewController(mediaBrowser, animated: true, completion: nil);
+                self.present(mediaBrowser, animated: true, completion: nil);
                 
             }
             break;
@@ -96,13 +97,12 @@ class RootViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
 /*
     UITableViewDataSource
 */
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
         return numberOfRows;
     }
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell
-    {
-        let cell = tableView.dequeueReusableCellWithIdentifier("TitleCellIdentifier", forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TitleCellIdentifier", for: indexPath as IndexPath)
   
         switch(indexPath.row)
         {

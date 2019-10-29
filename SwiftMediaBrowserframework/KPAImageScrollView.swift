@@ -22,15 +22,15 @@ class KPAImageScrollView: UIScrollView,UIScrollViewDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame);
         self.imageView = UIImageView(frame: frame);
-        self.imageView.contentMode = UIViewContentMode.ScaleAspectFit;
-        self.imageView.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        self.imageView.contentMode = UIView.ContentMode.scaleAspectFit;
+        self.imageView.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight,UIView.AutoresizingMask.flexibleWidth];
         self.delegate = self;
         imageView!.layer.cornerRadius = 11.0
       //  imageView.backgroundColor = UIColor.redColor()
         imageView!.clipsToBounds = false
         self.addSubview(imageView!)
         
-        tapRecognizer = UITapGestureRecognizer(target: self, action: "doubleTapDetected:");
+        tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(KPAImageScrollView.doubleTapDetected(tapped:)));
         tapRecognizer.numberOfTapsRequired = 2;
         self.addGestureRecognizer(tapRecognizer);
     }
@@ -42,7 +42,7 @@ class KPAImageScrollView: UIScrollView,UIScrollViewDelegate {
         return self.imageView
     }
     //tag gesture
-    func doubleTapDetected(tapped:UITapGestureRecognizer)
+    @objc func doubleTapDetected(tapped:UITapGestureRecognizer)
     {
         if(self.zoomScale > 1.0)
         {

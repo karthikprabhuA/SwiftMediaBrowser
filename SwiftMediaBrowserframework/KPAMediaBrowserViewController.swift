@@ -12,6 +12,7 @@ protocol KPAMediaBrowserCollectionViewDelegate
     
 }
 class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
+   
 
     var delegate:KPAMediaBrowserCollectionViewDelegate?;
     var dataSourceImages:Array<String>!;
@@ -34,12 +35,12 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         marginL = 0;  gutterL = 1;
         
         // For pixel perfection...
-        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.Pad) {
+        if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad) {
             // iPad
             columns = 6; columnsL = 8;
             margin = 1 ; gutter = 2;
             marginL = 1; gutterL = 2;
-        } else if (UIScreen.mainScreen().bounds.size.height == 480) {
+        } else if (UIScreen.main.bounds.size.height == 480) {
             // iPhone 3.5 inch
             columns = 3; columnsL = 4;
             margin = 0; gutter = 1;
@@ -63,21 +64,21 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     if(self.collectionView == nil)
     {
     self.collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
-    self.collectionView?.autoresizingMask = [UIViewAutoresizing.FlexibleHeight,UIViewAutoresizing.FlexibleWidth];
+        self.collectionView?.autoresizingMask = [UIView.AutoresizingMask.flexibleHeight,UIView.AutoresizingMask.flexibleWidth];
     }
         
     self.collectionView!.dataSource = self
     self.collectionView!.delegate = self
-    self.collectionView!.registerClass(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
-    self.collectionView!.backgroundColor = UIColor.whiteColor()
+        self.collectionView!.register(KPAMediaBrowserCollectionViewCell.classForCoder(), forCellWithReuseIdentifier: "MediaBrowserCellIdentifier")
+        self.collectionView!.backgroundColor = UIColor.white
     self.view.addSubview(collectionView!)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
-    override func viewWillAppear(animated: Bool) {
-        self.navigationController?.navigationBarHidden = false;
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false;
         if(self.collectionView != nil)
         {
             self.collectionView?.reloadData();
@@ -94,10 +95,10 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     func performLayout() {
     if let navBar = self.navigationController?.navigationBar
     {
-    self.collectionView!.contentInset = UIEdgeInsetsMake(navBar.frame.origin.y + navBar.frame.size.height + self.getGutter(), 0, 0, 0);
+        self.collectionView!.contentInset = UIEdgeInsets(top: navBar.frame.origin.y + navBar.frame.size.height + self.getGutter(), left: 0, bottom: 0, right: 0);
         }
     }
-    override func willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
+    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
         self.collectionView!.reloadData();
         //let numberFormatter = NSNumberFormatter()
         //let number = numberFormatter.numberFromString(UIDevice.currentDevice().systemVersion)?.floatValue
@@ -111,7 +112,7 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     */
     func getColumns()->CGFloat
     {
-    if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait))
+        if(UIInterfaceOrientation.portrait.isPortrait)
     {
     return columns;
     }
@@ -121,7 +122,7 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     }
     
     func getMargin() -> CGFloat {
-        if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait)){
+        if(UIInterfaceOrientation.portrait.isPortrait){
     return margin;
     } else {
     return marginL;
@@ -129,7 +130,7 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     }
     
     func getGutter() -> CGFloat {
-        if(UIInterfaceOrientationIsPortrait(UIInterfaceOrientation.Portrait)){
+        if(UIInterfaceOrientation.portrait.isPortrait){
     return gutter;
     } else {
     return gutterL;
@@ -142,7 +143,7 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         let gutter = Float(self.getGutter());
         let columns = Float(self.getColumns());
     let value = floorf(((Float(self.view!.bounds.size.width) - (columns - 1.0 * gutter - 2.0 * margin)) / columns));
-    return CGSizeMake(CGFloat(value), CGFloat(value));
+        return CGSize(width:CGFloat(value), height:CGFloat(value));
     }
 
     /*
@@ -161,34 +162,34 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
         return numberOfSections;
     }
 
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath)
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath)
     {
         print("selected row\(indexPath.row)")
-        let pageViewController = KPAMBPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        let pageViewController = KPAMBPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         pageViewController.view.frame = self.collectionView!.frame;
         pageViewController.pageImages = dataSourceImages;
         pageViewController.currentIndex = indexPath.row;
-        let startingViewController: KPAImageViewController = pageViewController.viewControllerAtIndex(indexPath.row)!
+        let startingViewController: KPAImageViewController = pageViewController.viewControllerAtIndex(index: indexPath.row)!
         let viewControllers: NSArray = [startingViewController]
-        pageViewController.setViewControllers(viewControllers as? [UIViewController], direction:UIPageViewControllerNavigationDirection.Forward, animated: true, completion: nil)
-        self.navigationController?.navigationBarHidden = true;
+        pageViewController.setViewControllers(viewControllers as? [UIViewController], direction:UIPageViewController.NavigationDirection.forward, animated: true, completion: nil)
+        self.navigationController?.isNavigationBarHidden = true;
 
-        UIView.transitionWithView(self.view, duration: 0.5, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: { () -> Void in
-            self.addChildViewController(pageViewController)
+        UIView.transition(with: self.view, duration: 0.5, options: UIView.AnimationOptions.transitionCrossDissolve, animations: { () -> Void in
+            self.addChild(pageViewController)
             self.view.addSubview(pageViewController.view)
-            pageViewController.didMoveToParentViewController(self)
+            pageViewController.didMove(toParent: self)
             }, completion: nil);
     
     }
     /*
     Collectionview data source
     */
-     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return (dataSourceImages?.count)!;
     }
     
-     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell:KPAMediaBrowserCollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier("MediaBrowserCellIdentifier", forIndexPath: indexPath) as! KPAMediaBrowserCollectionViewCell;
+     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell:KPAMediaBrowserCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MediaBrowserCellIdentifier", for: indexPath) as! KPAMediaBrowserCollectionViewCell;
         let image = dataSourceImages[indexPath.row] ;
         cell.imageView.image = UIImage(named:image);
                 return cell;
@@ -197,28 +198,26 @@ class KPAMediaBrowserViewController: UIViewController,UICollectionViewDataSource
     /*
     FlowLayout delegate
     */
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
-        insetForSectionAtIndex section: Int) -> UIEdgeInsets
+        insetForSectionAt section: Int) -> UIEdgeInsets
     {
         let margin = self.getMargin();
-        return UIEdgeInsetsMake(margin, margin, margin, margin);
+        return UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin);
     }
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
-        minimumLineSpacingForSectionAtIndex section: Int) -> CGFloat
+        minimumLineSpacingForSectionAt section: Int) -> CGFloat
     {
         return self.getGutter();
     }
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
-        minimumInteritemSpacingForSectionAtIndex section: Int) -> CGFloat
+        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat
     {
         return self.getGutter();
     }
-    func collectionView(collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize
+func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
     {
         return calculatedLayoutItemSize();
     }
